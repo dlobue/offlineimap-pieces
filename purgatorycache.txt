@@ -1,0 +1,17 @@
+goal of "purgatory" cache:
+to determine whether a message has simply been moved or renamed when we are unable to find a message we expected to be present in order to avoid the needless transfer (or deletion) of messages already present on the filesystem, local or remote.
+
+how to determine if a message we come across and have no prior knowledge about is really just one of the messages we thought was deleted?
+well, if the message is on the local filesystem, make a sha1 hash of it and see if it is already in our content db. if it is, then maybe its one of our mia messages.
+
+if the message is on imap, what then? we can't build a sha1 hash without downloading the entire email, which is what we're trying to avoid doing unecessarily.
+there's no way to guarantee a msgid is unique or will even be present, so using just the msgid is not a viable option. however, if the msgid, internaldate, and the number of bytes in the message are all identical, i'd say that the chances of two messages with those only three things being identical and everything else being different is about as close to 0 as you can get.
+
+
+
+since one size does not fit all, in order to keep life simple just do a selectby, and then test to see if any of the messages related to the content found in purgatory.
+
+
+
+
+need an option to be able to tone-down amount of legwork app does: if the imap server is slow enough, and the user has enough bandwidth, it might be faster to just download the email again anyway.

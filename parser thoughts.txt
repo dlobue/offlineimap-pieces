@@ -1,0 +1,45 @@
+266 FETCH (FLAGS (\Seen) UID 31608 INTERNALDATE "30-Jan-2008 02:48:01 +0000" RFC822.SIZE 4509 ENVELOPE ("Tue, 29 Jan 2008 14:00:24 +0000" "Aprenda as tXcnicas e os truques da cozinha mais doce..." (("Ediclube" NIL "ediclube" "sigmathis.info")) (("Ediclube" NIL "ediclube" "sigmathis.info")) ((NIL NIL "ediclube" "sigmathis.info")) ((NIL NIL "helder" "example.com")) NIL NIL NIL "<64360f85d83238281a27b921fd3e7eb3@localhost.localdomain>"))
+
+* 69 FETCH (UID 152132 FLAGS (\Seen) INTERNALDATE " 1-Feb-2010 17:14:13 -0700" RFC822.SIZE 994 BODY[HEADER.FIELDS (Message-ID)] {86}\r\nMessage-ID: <DC39B2A54BA9FF409E5BE5A51D4AE1FE0C6ED2DB@Exchange2k3.corp.stamps.com>\r\n\r\n)\r\n
+
+(UID FLAGS INTERNALDATE RFC822.SIZE BODY.PEEK[HEADER.FIELDS (Message-ID)
+
+[*,69,FETCH,(UID,152132),(FLAGS,(\Seen)), (INTERNALDATE," 1-Feb-2010 17:14:13 -0700"),(RFC822.SIZE 994), (BODY[HEADER.FIELDS (Message-ID)] {86}\r\nMessage-ID: <DC39B2A54BA9FF409E5BE5A51D4AE1FE0C6ED2DB@Exchange2k3.corp.stamps.com>\r\n\r\n)\r\n
+
+untagged, msg num 69, fetch response
+what follows is from the body of the message (as opposed to the envelope), specifically 'Message-ID' field from the header
+
+inside [] = METADATA
+treat [] like dquotes?: yes.
+[]()"{} all mean the same thing: this property's data doesn't end at the next space. keep going until you find the closing side
+
+provided body is ALWAYS last, body = [BODY, [METADATA], SIZE, DATA]
+
+put spaces around each type of enclosure marker
+look ahead to next token
+data structure = tuple. ie: ('attribute name', 'attribute data')
+what if attr has more than one values? does data look like this:
+('attr name', 'data1', 'data2', 'data3')
+or this:
+('attr name', ('data1', 'data2', 'data3'))
+
+('attr name', ('data1', 'data2', ('data3', 'data3.data1')))
+('attr name', 'data1', 'data2', ('data3', 'data3,data1'))
+
+
+neither.
+tuple = a set of related data of differing types. ex: key and value
+list = same type of data. ex: all flags that apply to a message
+('attr name', ['data1', 'data2', ('data3', 'data3.data1')])
+
+
+so fetch response looks like this:
+[*, msgseqnum, response type (fetch), ( attr1 key, attr1 value, attr2 key, attr2 value, attr3 key, attr3 value ) crlf ]
+
+untagged( fetch( msgid, data))
+untagged( msgseqnum, response type, data )
+
+
+parser builds data packets.
+should current packet be closed and new one started when i detect a new response, or when i detect the end of the current one?
+

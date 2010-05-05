@@ -1,0 +1,22 @@
+for msg in cache:
+  lm = local.pop(msg)
+  rm = remote.pop(msg)
+  if not lm or not rm:
+    purgatory[msg] = lm or rm
+  else:
+    if msg.flags != lm.flags or msg.flags != rm.flags:
+      flagupdate[msg] = lm,rm
+
+for msg in local:
+  hash = sha1(msg)
+  if hash in contentcache:
+    to_move = [purgatory[m],m for m in contentcache[hash].messages if m in purgatory]
+  else:
+    sync.append(msg)
+
+for msg in remote:
+  vitals = uid fetch msg.uid (flags 822.size internaldate body.peek[message-id])
+  if vitals.message-id in contentcache:
+    to_move = [purgatory[m],m for m in contentcache[hash].messages if m in purgatory]
+  else:
+    sync.append(msg)
