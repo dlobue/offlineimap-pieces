@@ -1,3 +1,6 @@
+original pseudo code of idea on how to sort through cache.
+
+
 for msg in cache:
   lm = local.pop(msg)
   rm = remote.pop(msg)
