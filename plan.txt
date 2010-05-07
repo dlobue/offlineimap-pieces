@@ -13,10 +13,40 @@ and i need to finish implementing the connection logic
 
 
 
+separate transports out of bottom-most IMAP class. put them in the top when instantiating the IMAP object. cleaner this way - no "if steam elif ssl else" bs.
+
+how to do?
+
+imapp._imap = imapll
+imapll._transport = stream
+stream = tcp | ssl | process
+
+imapll.read:
+  self._transport.read()
 
 
 
 
 
+thoughts:
+
+-when to announce mail client/offlineimap rewrite? when ready for public consumption, or early in hopes of generating interest and more developers?
+-what areas do you want to work on?
+-do you prefer easy tasks or challenges?
+-do you know how to write unit tests?
 
 
+
+indexer options:
+-create python bindings for gmime and keep using my indexer
+-use notmuch to index mail for sleep and:
+  -add feature to notmuch to merge/split threads
+  -add feature to notmuch to use subject as threading hint.
+  -add feature on python side to merge/split threads.
+  -add feature on python side to join threads together using subject hint
+
+store mail directly in xapian db (from offlineimap -> xapian)
+   bonus: instant lookup of mail, less disk space requires, no need to worry about keeping flags in xapian db and in maildir in sync.
+   downside: still have to parse email before putting it into xapian, no other application would be able to use the mail in that format, xapian is _NOT_ threadsafe, converting mail to another format would be near impossible.
+
+   okay, the last downside isn't true, but it WOULD be a pain in the ass.
