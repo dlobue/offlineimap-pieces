@@ -1,0 +1,22 @@
+why am i stuck in offlineimap? what next?
+
+okay, i want to be able to queue a message for work as soon as I know what to do with it. in order to do this i need to implement the threadpool.
+
+in order to implement the threadpool I need to implement the connection handler/dispatcher as well as the remaining data models.
+ -what data models am i missing? what do i already have?
+
+in order to implement the connection handler I need a reliable and automatic to use sasl
+and i need to finish implementing the connection logic
+
+
+
+
+
+
+
+
+
+
+
+
+
