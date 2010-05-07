@@ -83,9 +83,15 @@ class flags(object):
             if '\\' in new_flags or ' ' in new_flags:
                 new_flags = new_flags.split()
             new_flags = (x for x in new_flags)
-        lambset = lambda x: setattr(self,
-                                    flagmap.get(x.strip('\\ ').lower(),
-                                    x.upper()), True)
+
+        def lambset(x):
+            try:
+                setattr(self, flagmap.get(x.strip('\\ ').lower(),
+                                                    x.upper()), True)
+            except AttributeError, e:
+                #FIXME add in logging system of some sort to capture more data
+                pass
+
         map(lambset, new_flags)
 
 def combine_flags(cached, local, remote):
