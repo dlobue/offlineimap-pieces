@@ -1,7 +1,3 @@
-last updates 2/16/10
-
-
-
 synctoken - 1 per repo (metadata) (or is it per folder?)
 syncobject - 1 per folder pair (local, remote)
 syncmgr - 1 per "max simul account sync"
@@ -105,3 +101,26 @@ During cache process delete cmd go directly to so:delete
 When so:x is done announce on acct:del chan
 When so:y hears done, announce notdone if not?
 No- soq gets done msg and looks for alldone
+
+
+to keep track of when to perform a sync again:
+after last sync operation finishes set a "half_life" timer that puts syncobject(folder) in syncqueue
+
+
+
+
+full/quick toggle:
+
+self._qcount = int()
+qlimit = number of quick syncs to perform between full syncs
+
+if self._qcount < qlimit:
+  do quick
+  self._qcount += 1
+else:
+  self.qcount = 0
+  do full
+
+
+if config.quick:
+  reset_timer = config.autorefresh/config.quick
