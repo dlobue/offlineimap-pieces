@@ -1,0 +1,78 @@
+NOTE: still being implemented. code in controller.py
+
+
+get handler to folder in local repo
+"write the mailboxes"?
+load status folder ##no need. db replaces this.
+if no uidvalidity on local folder, it is new. delete status cache
+if this is a quick sync, check both remote and local folders to see if there has been any change since last checked.
+   if no changes, restore atime and stop.
+
+go through localfolder and cache its current state.
+
+
+        # If either the local or the status folder has messages and there is a UID
+        # validity problem, warn and abort.  If there are no messages, UW IMAPd
+        # loses UIDVALIDITY.  But we don't really need it if both local folders are
+        # empty.  So, in that case, just save it off.
+
+go through remote folder and cache its current state.
+
+NO:
+            # Delete local copies of remote messages.  This way,
+            # if a message's flag is modified locally but it has been
+            # deleted remotely, we'll delete it locally.  Otherwise, we
+            # try to modify a deleted message's flags!  This step
+            # need only be taken if a statusfolder is present; otherwise,
+            # there is no action taken *to* the remote repository.
+
+sync local to remote
+
+sync remote changes to local
+
+update status folder
+
+done
+
+
+
+
+2 repos, 3 different states.
+state 1- last sync
+state 2- local folder
+state 3- remote folder
+
+what do we care about?
+deleted messages
+moved messages
+messages whose flags have changed
+new messages
+
+1- compare remote vs last sync.
+  -new messages go in rnew_deque
+  -deleted messages go in rdel_deque
+  -changed messages go in rchg_deque
+
+2- compare local vs last sync.
+  -new messages go in lnew_deque
+  -deleted messages go in ldel_deque
+  -changed message go in lchg_deque
+
+no. cross-checks will drive me crazy
+lazy processing. everything save deletes go in same container. when it is their turn to be processed, then we check. ....?
+1-
+  -new msgs go in sync_deque as (uid, source)
+  -del msgs go in del_deque as (uid, source)
+  -changed msgs go in sync_deque as (uid, source, change)
+
+2-
+  -new msgs go in sync_deque
+  -....
+  -....
+
+
+on each msg changes we make sure that the matching msg is not in the del_deque
+on each new msg we check db to see if msg content already exists on other side.
+
+dels come LAST
+on each del check to see if msg wasn't simply moved.

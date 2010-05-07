@@ -1,0 +1,107 @@
+last updates 2/16/10
+
+
+
+synctoken - 1 per repo (metadata) (or is it per folder?)
+syncobject - 1 per folder pair (local, remote)
+syncmgr - 1 per "max simul account sync"
+(repo|connection)distributer - 1
+
+difference between connection and repo:
+connection = ex- maildir.Maildir, imaplibii.imapp, imaplib.IMAP4
+repo = connection metadata (server, port, username)
+   -interface pattern
+   -polymorphism
+   -connection obj must be given to each method.
+
+so:a is told to do a full sync
+task to update local cache is added to so:a task queue
+  -addition of task to task queue initiates a check to see if so:a is in soq or is the queue in sm. if both checks fail, put so:a in soq.
+so:a goes into queue for so's. (^^^)
+so:a is get() from syncobjectqueue and replaces queue attribute in syncmgr
+...
+tasks/jobs for folder pair that so:a represents are worked on.
+#todo: add in working pool steps
+#todo: so.put(job), so.get() returns (job, synctoken)
+...
+
+so:a is emptied and some workers are ready for more work.
+  scenario a:
+    so:a is empty but several tasks are still in progress.
+  scenario b:
+    so:a is empty and all tasks are done.
+for both: syncmgr queue property is set to None and does blocking get to soq
+
+
+update cache process:
+task goes into so taskq for updating cache
+in worker:
+-build query (for messages newer than, smaller than, etc.)
+-process results (messages x,y,z no longer exist locally, a,b,c no longer exist remote, q,w,e have flags changed, new messages y,u,i, etc)
+-build list of task tuples to be added to so taskq en masse.
+-send message to so with task tuple list.
+so recieves message, task tuple list goes into mass put method that also adds it back to soq if necessary
+
+
+connection pool:
+getconnection method takes two arguments- repo and folder.
+aquire lock
+aquire semaphore
+tmplist = filter( not in use, self.connections[repo])
+if not tmplist: make new connection.
+else:
+fldrlist = filter( is in folder, tmplist)
+----------
+  if fldrlist: return (true, fldrlist[0])
+  else: return (false, tmplist[0])
+release
+----------
+  if fldrlist:
+      C = fldrlist[0]
+      Self.inuse.append(c)
+      Return c
+  else:
+      C = tmplist[0]
+      Self.inuse.append(c)
+      Release
+      Changefldr(c, folder)
+      Return c
+
+***************
+FAIL
+
+delete idea- delete tasks go into sm internal deleteq
+delete process:
+worker gets task
+if task is delete and sm state is delete: delete.
+else put task in sm internal deleteq
+
+deleteq is processed when all syncs are done for acct.
+how to tell: internal timer
+worker gets a task
+worker cancels timer and adds 1 to internal private var
+worker does work
+worker finishes
+worker decrements 1 from internal private var
+if private var is 0, start short timer (3-10 sec?)
+
+when timer goes off:
+sm: start new longer timer (30-60sec) to rerun method to check again.
+sm: send message to soq asking if all syncs are completed.
+soq: checks sos for each acct
+soq: if all sos are still syncing, do nothing.
+soq: if all sos for an acct x are done syncing and are cooling off, send message to sm saying so.
+sm: receives msg saying acct x is done syncing and proceed with delete
+sm: cancel timer
+sm: set state delete
+sm: ...?
+
+***************
+
+##YES - sorta. idea more fleshed out in purgatory cache doc.
+Delete idea:
+use pubsub
+During cache process delete cmd go directly to so:delete
+When so:x is done announce on acct:del chan
+When so:y hears done, announce notdone if not?
+No- soq gets done msg and looks for alldone
